@@ -10,7 +10,7 @@ exports.getProducts = async (req, res) => {
 };
 
 
-exports.createProducts =async (req, res) => {
+exports.createProduct = async (req, res) => {
     const newProduct = new Product(req.body);
     await newProduct.save ();
     res.json(newProduct);
