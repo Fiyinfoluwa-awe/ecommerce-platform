@@ -19,6 +19,10 @@ const productRoutes = require('./routes/productRoutes');
 const userRoutes = require('./routes/userRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 
+//Root route (optional)
+app.get('/', (req, res) => {
+    res.send('Welcome to the E-commerce API')
+});
 
 //Use routes
 app.use('/api/products', productRoutes);
