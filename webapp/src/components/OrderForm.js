@@ -8,9 +8,11 @@ const OrderForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:5000/orders', {productId, quantity });
-            alert('Order placed successfully');
+            const response = await axios.post('http://localhost:5000/orders', { productId, quantity });
+            console.log(response.data); // Log the server's response
+            alert('Order placed successfully!');
         } catch (error) {
+            console.error(error); // Log the error for debugging
             alert('Order failed!');
         }
     };
@@ -26,6 +28,7 @@ const OrderForm = () => {
                 <label>Quantity:</label>
                 <input type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} required />
             </div>
+            <button type="submit">Place Order</button>
         </form>
     );
 };
