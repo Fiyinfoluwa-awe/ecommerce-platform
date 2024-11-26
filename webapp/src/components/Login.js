@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from 'axios';
-import Logo from '../Logo';
+import Logo from './Logo';
 import '../styles.css';
 
 const Login = () => {

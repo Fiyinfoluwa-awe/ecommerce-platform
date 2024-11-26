@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from 'axios';
+import Logo from "./Logo";
 import '../styles.css';
 
 
@@ -22,6 +23,7 @@ const OrderForm = () => {
 
     return (
         <form onSubmit={handleSubmit}>
+            <Logo />
             <h1>Place Order</h1>
             <div>
                 <label>Product ID:</label>
