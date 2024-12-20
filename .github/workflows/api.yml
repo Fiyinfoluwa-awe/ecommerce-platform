@@ -34,7 +34,24 @@ jobs:
               working-directory: ./api
               run: npm run build   # only if you have a build script
 
-            - name: Deploy to Server
+            - name: Log in to Amazon ECR
+              uses: aws-actions/amazon-ecr-login@v1
+
+            - name: Build and Push Docker Image to Amazon ECR 
+              env: 
+                ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+                ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+                IMAGE_TAG: latest
               run: |
-              # Add deployment commands here, like uploading to your server or using a service like AWs, Heroku, etc.
+                docker tag e-commerce:latest 026956291686.dkr.ecr.us-east-1.amazonaws.com/e-commerce:latest ./api
+                docker push 026956291686.dkr.ecr.us-east-1.amazonaws.com/e-commerce:latest
+
+            - name: Deploy to ECS
+              uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+              with:
+                task-definition: ecs-task-definition.json
+                service: ${{ secrets.ECS_SERVICE }}
+                cluster: ${{ secrets.ECR_CLUSTER }}
+                wait-for-service-stability: true
+
 
