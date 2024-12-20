@@ -48,7 +48,7 @@ jobs:
             - name: Build Docker Image
               working-directory: ./webapp
               run: |
-                docker build -t reat-frontend .
+                docker build -t react-frontend .
 
           # 7. Tag and Push Image to ECR
             - name: Push Docker Image to ECR
