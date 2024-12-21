@@ -15,7 +15,7 @@ COPY . ./
 # copy everything frm the 'webapp' folder to the container
 
 # Build the React app
-RUN npm run bui
+RUN npm run build
 
 
 # Serve stage - Using Nginx to serve the built app 
