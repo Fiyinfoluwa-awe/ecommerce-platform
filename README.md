@@ -52,6 +52,11 @@ Created the products listings, user accounts and order processing
 
 ![alt text](<step 7 created order.js.png>)
 
+
+Created my index.js file
+
+![alt text](<step 10 created the index .js.png>)
+
 Implemented unit tests for my Api 
 
 
@@ -60,6 +65,21 @@ Implemented unit tests for my Api
 
 In the `webapp` directory , created a simple React application that interact with the backend API.
  The frontend has the basic features like product listing, user login, and order placement.
+
+ Installed React
+
+ ![alt text](<step 11 installed react and  creating webapp folder.png>)
+ 
+ Installed ***axios*** 
+
+ ``npm install axios``
+
+
+![alt text](<step 12 installed axios.png>) 
+
+ Created the  basic features; ProductLists, User login and order placements.
+
+![alt text](<step 13 productlist orderform and login file.png>)
 
 *Continous Integration Workflow*
 ---
@@ -70,12 +90,35 @@ Wrote the Github Actions workflows for the backend and frontend that:
 * Runs tests
 * Builds the application
 
+
+![alt text](<step 14 successful webapp workflow.png>)
+
+
+
 *Docker Integration*
 ---
 
 Created Dockerfiles for both the backend and frontend.
 Modified my github workflows to build Docker images.
 
+***Dockerfile for API***
+
+![alt text](<created dockerfile for api.jpg>)
+
+***Dockerfile for webapp***
+
+![alt text](<created dockerfile for webapp.jpg>)
+
+*Deploy to Cloud*
+---
+
+Configured Github Actions to deploy my docker images to my AWS repository. 
+
+***Created AWS private repositiries for my backend and frontend***
+
+![alt text](<created aws repositories.jpg>)
+
+Using my Github Secrets to securely store and access cloud credentials.
 
 *Continous Integration*
 ---
