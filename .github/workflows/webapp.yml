@@ -22,16 +22,34 @@ jobs:
               with: 
                 node-version: '18.x'
 
-          # 3. Install Dependencies and Build React App
+          # 3. Cache Node.js dependencies 
+            - name: Cache Node.js modules
+              id: cache-node-modules
+              uses: actions/cache@v3
+              with: 
+                path: ./webapp/node_modules
+                key: ${{ runner.os}}-node-${{ hashFiles('./webapp/package-lock.json') }}
+                restore-keys: |
+                   ${{ runner.os }}-node-
+
+          # 4. Install Dependencies and Build React App
             - name: Install dependencies
+              if: steps.cache-node-modules.outputs.cache-hit != 'true'
               working-directory: ./webapp
               run: npm install
 
+          # 5. Run tests
+            - name: Run tests
+              working-directory: ./webapp
+              run: npm test
+
+
+          # 6. Build Webapp
             - name: Build Webapp
               working-directory: ./webapp
               run: npm run build
 
-          # 4. Configure AWS CLI 
+          # 7. Configure AWS CLI 
             - name:  Configure AWS CLI
               uses: aws-actions/configure-aws-credentials@v3
               with: 
@@ -39,18 +57,18 @@ jobs:
                 aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                 aws-region: ${{ secrets.AWS_REGION}}  
 
-          # 5. Login to Amazon ECR
+          # 8. Login to Amazon ECR
             - name: Login to Amazon ECR
               id: login-ecr
               uses: aws-actions/amazon-ecr-login@v2
 
-          # 6. Build Docker Image
+          # 9. Build Docker Image
             - name: Build Docker Image
               working-directory: ./webapp
               run: |
                 docker build -t react-frontend .
 
-          # 7. Tag and Push Image to ECR
+          # 10. Tag and Push Image to ECR
             - name: Push Docker Image to ECR
               env: 
                 ECR_REPOSITORY: e-commercefrontend
@@ -60,7 +78,7 @@ jobs:
                 docker tag react-frontend:latest $ECR_URI:latest
                   docker push $ECR_URI:latest
 
-          # 8. Deploy the image to to EC2 or ECS 
+          # 11. Deploy the image to to EC2 or ECS 
             - name: Deploy to Amazon ECS
               uses: aws-actions/amazon-ecs-deploy-task-definition@v1
               with: 

@@ -14,44 +14,80 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
+          # 1. Checkout code
             - name: Checkout code
               uses: actions/checkout@v3
 
+
+          #2. Setup Node.js
             - name: Set up Node.js
               uses: actions/setup-node@v3
               with:
                 node-version: '18.x'  # or use the latest stable version 
 
+          # 3. Cache Node.js dependencies
+            - name: Cache Node.js modules
+              id: cache-node-modules
+              uses: actions/cache@v3
+              with:
+                path: ./api/node_modules
+                key: ${{ runner.os }}-node-${{ hashFiles('./api/package-lock.json')}}
+                restore-keys: |
+                    ${{ runner.os }}-node-
+          
+          # 4. Install dependencies
             - name: Install dependencies
+              if: steps.cache-node-modules.outputs.cache-hit != 'true'
               working-directory: ./api
               run: npm install
 
+          # 5. Run tests
             - name: Run tests
               working-directory: ./api
               run: npm test
-
+          
+          # 6. Build API
             - name: Build API 
               working-directory: ./api
               run: npm run build   # only if you have a build script
 
-            - name: Log in to Amazon ECR
-              uses: aws-actions/amazon-ecr-login@v1
+          # 7. Configure AWS CLI 
+            - name:  Configure AWS CLI
+              uses: aws-actions/configure-aws-credentials@v3
+              with: 
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                aws-region: ${{ secrets.AWS_REGION}}  
 
-            - name: Build and Push Docker Image to Amazon ECR 
-              env: 
-                ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
-                ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-                IMAGE_TAG: latest
+          # 8. Login t Amazon ECR
+            - name: Login to Amazon ECR
+              id: login-ecr
+              uses: aws-actions/amazon-ecr-login@v2
+
+          # 9. Build Docker Image
+            - name: Build Docker Image
+              working-directory: ./webapp
               run: |
-                docker tag e-commerce:latest 026956291686.dkr.ecr.us-east-1.amazonaws.com/e-commerce:latest ./api
-                docker push 026956291686.dkr.ecr.us-east-1.amazonaws.com/e-commerce:latest
+                docker build -t react-backend .
 
-            - name: Deploy to ECS
+          # 10. Tag and Push Image to ECR
+            - name: Push Docker Image to ECR
+              env: 
+                ECR_REPOSITORY: e-commercebackend
+                IMAGE_TAG: latest
+              run: | 
+                ECR_URI=${{ steps.login-ecr.outputs.registry }}/e-commercebackend    
+                docker tag react-backend:latest $ECR_URI:latest
+                  docker push $ECR_URI:latest
+
+          # 11. Deploy the image to to EC2 or ECS 
+            - name: Deploy to Amazon ECS
               uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-              with:
-                task-definition: ecs-task-definition.json
-                service: ${{ secrets.ECS_SERVICE }}
-                cluster: ${{ secrets.ECR_CLUSTER }}
+              with: 
+                task-definition: ./webapp/ecs-task-definition.json
+                service: react-frontend-service
+                cluster: react-frontend-cluster
                 wait-for-service-stability: true
+
 
 

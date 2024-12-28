@@ -120,13 +120,28 @@ Configured Github Actions to deploy my docker images to my AWS repository.
 
 Using my Github Secrets to securely store and access cloud credentials.
 
+***Created github secrets for aws key id and others***
+![alt text](<created a github secrets for my aws access key id and others.jpg>)
+
+***Inputted the use of github secrets in my workflow***
+
+![alt text](<inputting the use of github secrets into my workflows.jpg>)
+
 *Continous Integration*
 ---
 
 Configure my workflows to deploy updates automatically to the cloud environment when changes are pushed to the main branch.
 
+![alt text](<Configured my workflows to deploy updates automatically when changes are pushed to main-1.jpg>)
+
+
 *Performance and Security*
 ---
 
 Implemented caching in my workflows to optimitize build times.
+
+![alt text](<Incorporated caching into my worflows-1.jpg>)
+
+
+
 Used Github secrets to secure all my security data including API keys and database credentials.
