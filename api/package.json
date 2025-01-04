@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "node ./node_modules/.bin/mocha"
   },
   "keywords": [],
   "author": "",
@@ -18,3 +18,4 @@
     "mocha": "^10.8.2"
   }
 }
+
