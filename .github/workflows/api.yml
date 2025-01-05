@@ -1,4 +1,3 @@
-
 name: API CI/CD
 
 on:
@@ -19,11 +18,11 @@ jobs:
               uses: actions/checkout@v3
 
 
-          #2. Setup Node.js
+          # 2. Setup Node.js
             - name: Set up Node.js
               uses: actions/setup-node@v3
               with:
-                node-version: '18.x'  # or use the latest stable version 
+                node-version: '18.x'  # Use the latest stable Node.js version
 
           # 3. Cache Node.js dependencies
             - name: Cache Node.js modules
@@ -31,46 +30,55 @@ jobs:
               uses: actions/cache@v3
               with:
                 path: ./api/node_modules
-                key: ${{ runner.os }}-node-${{ hashFiles('./api/package-lock.json')}}
+                key: ${{ runner.os }}-node-${{ hashFiles('./api/package-lock.json') }}
                 restore-keys: |
                     ${{ runner.os }}-node-
           
           # 4. Install dependencies
             - name: Install dependencies
-              if: steps.cache-node-modules.outputs.cache-hit != 'true'
               working-directory: ./api
-              run: npm install
-
-          # 5. Run tests
-            - name: Run tests
-              working-directory: ./api
-              run: npm test
+              run: npm ci  # Use npm ci for CI environments to ensure consistent installs
           
-          # 6. Build API
+          # 5. Install Mocha
+            - name: Install Mocha
+              working-directory: ./api
+              run: npm install --save-dev mocha
+
+          # 6. Fix Permissions for Mocha (if required)
+            - name: Fix Permissions
+              working-directory: ./api
+              run: chmod +x ./node_modules/.bin/mocha
+
+          # 7. Run Mocha tests
+            - name: Run Mocha tests
+              working-directory: ./api
+              run: npx mocha --recursive
+          
+          # 8. Build API
             - name: Build API 
               working-directory: ./api
-              run: npm run build   # only if you have a build script
+              run: npm run build  # Run build only if you have a build script
 
-          # 7. Configure AWS CLI 
-            - name:  Configure AWS CLI
+          # 9. Configure AWS CLI 
+            - name: Configure AWS CLI
               uses: aws-actions/configure-aws-credentials@v3
               with: 
                 aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
                 aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                aws-region: ${{ secrets.AWS_REGION}}  
+                aws-region: ${{ secrets.AWS_REGION }}  
 
-          # 8. Login t Amazon ECR
+          # 10. Login to Amazon ECR
             - name: Login to Amazon ECR
               id: login-ecr
               uses: aws-actions/amazon-ecr-login@v2
 
-          # 9. Build Docker Image
+          # 11. Build Docker Image
             - name: Build Docker Image
-              working-directory: ./webapp
+              working-directory: ./api
               run: |
                 docker build -t react-backend .
 
-          # 10. Tag and Push Image to ECR
+          # 12. Tag and Push Image to ECR
             - name: Push Docker Image to ECR
               env: 
                 ECR_REPOSITORY: e-commercebackend
@@ -78,16 +86,17 @@ jobs:
               run: | 
                 ECR_URI=${{ steps.login-ecr.outputs.registry }}/e-commercebackend    
                 docker tag react-backend:latest $ECR_URI:latest
-                  docker push $ECR_URI:latest
+                docker push $ECR_URI:latest
 
-          # 11. Deploy the image to to EC2 or ECS 
+          # 13. Deploy the image to EC2 or ECS
             - name: Deploy to Amazon ECS
               uses: aws-actions/amazon-ecs-deploy-task-definition@v1
               with: 
-                task-definition: ./webapp/ecs-task-definition.json
+                task-definition: ./api/ecs-task-definition.json
                 service: react-frontend-service
                 cluster: react-frontend-cluster
                 wait-for-service-stability: true
+
 
 
 
