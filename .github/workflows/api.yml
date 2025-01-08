@@ -37,29 +37,21 @@ jobs:
           # 4. Install dependencies
             - name: Install dependencies
               working-directory: ./api
-              run: npm ci  # Use npm ci for CI environments to ensure consistent installs
+              run: npm ci  # Use npm ci for CI environments to ensure consistent & clean installs
           
-          # 5. Install Mocha
-            - name: Install Mocha
-              working-directory: ./api
-              run: npm install --save-dev mocha
+          
 
-          # 6. Fix Permissions for Mocha (if required)
-            - name: Fix Permissions
-              working-directory: ./api
-              run: chmod +x ./node_modules/.bin/mocha
-
-          # 7. Run Mocha tests
+          # 5. Run Mocha tests
             - name: Run Mocha tests
               working-directory: ./api
-              run: npx mocha --recursive
+              run: npm test
           
-          # 8. Build API
+          # 6. Build API
             - name: Build API 
               working-directory: ./api
               run: npm run build  # Run build only if you have a build script
 
-          # 9. Configure AWS CLI 
+          # 7. Configure AWS CLI 
             - name: Configure AWS CLI
               uses: aws-actions/configure-aws-credentials@v3
               with: 
@@ -67,18 +59,18 @@ jobs:
                 aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                 aws-region: ${{ secrets.AWS_REGION }}  
 
-          # 10. Login to Amazon ECR
+          # 8. Login to Amazon ECR
             - name: Login to Amazon ECR
               id: login-ecr
               uses: aws-actions/amazon-ecr-login@v2
 
-          # 11. Build Docker Image
+          # 9. Build Docker Image
             - name: Build Docker Image
               working-directory: ./api
               run: |
                 docker build -t react-backend .
 
-          # 12. Tag and Push Image to ECR
+          # 10. Tag and Push Image to ECR
             - name: Push Docker Image to ECR
               env: 
                 ECR_REPOSITORY: e-commercebackend
@@ -88,13 +80,13 @@ jobs:
                 docker tag react-backend:latest $ECR_URI:latest
                 docker push $ECR_URI:latest
 
-          # 13. Deploy the image to EC2 or ECS
+          # 11. Deploy the image to EC2 or ECS
             - name: Deploy to Amazon ECS
               uses: aws-actions/amazon-ecs-deploy-task-definition@v1
               with: 
                 task-definition: ./api/ecs-task-definition.json
-                service: react-frontend-service
-                cluster: react-frontend-cluster
+                service: react-backend-service
+                cluster: react-backend-cluster
                 wait-for-service-stability: true
 
 
