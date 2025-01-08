@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": " npx mocha --recursive"
+    "test": " npx mocha --recursive",
+    "build": " echo 'No build steps defined' "
   },
   "keywords": [],
   "author": "",
