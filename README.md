@@ -145,3 +145,11 @@ Implemented caching in my workflows to optimitize build times.
 
 
 Used Github secrets to secure all my security data including API keys and database credentials.
+
+![alt text](<created a github secrets for my aws access key id and others-1.jpg>)
+
+![alt text](<inputting the use of github secrets into my workflows-1.jpg>)
+
+successfully uploaded to my AWS repository
+
+![alt text](<uploaded to the ecs repo.jpg>)

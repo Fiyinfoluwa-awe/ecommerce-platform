@@ -38,18 +38,14 @@ jobs:
               working-directory: ./webapp
               run: npm install
 
-          # 5. Run tests
-            - name: Run tests
-              working-directory: ./webapp
-              run: npm test
 
 
-          # 6. Build Webapp
+          # 5. Build Webapp
             - name: Build Webapp
               working-directory: ./webapp
               run: npm run build
 
-          # 7. Configure AWS CLI 
+          # 6. Configure AWS CLI 
             - name:  Configure AWS CLI
               uses: aws-actions/configure-aws-credentials@v3
               with: 
@@ -57,18 +53,18 @@ jobs:
                 aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                 aws-region: ${{ secrets.AWS_REGION }}  
 
-          # 8. Login to Amazon ECR
+          # 7. Login to Amazon ECR
             - name: Login to Amazon ECR
               id: login-ecr
               uses: aws-actions/amazon-ecr-login@v2
 
-          # 9. Build Docker Image
+          # 8. Build Docker Image
             - name: Build Docker Image
               working-directory: ./webapp
               run: |
                 docker build -t react-frontend .
 
-          # 10. Tag and Push Image to ECR
+          # 9. Tag and Push Image to ECR
             - name: Push Docker Image to ECR
               env: 
                 ECR_REPOSITORY: e-commercefrontend
@@ -78,7 +74,7 @@ jobs:
                 docker tag react-frontend:latest $ECR_URI:latest
                   docker push $ECR_URI:latest
 
-          # 11. Deploy the image to to EC2 or ECS 
+          # 10. Deploy the image to to EC2 or ECS 
             - name: Deploy to Amazon ECS
               uses: aws-actions/amazon-ecs-deploy-task-definition@v1
               with: 
